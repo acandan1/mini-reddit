@@ -5,12 +5,19 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title><%= title %></title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    // Tailwind dark mode configuration
+    tailwind.config = {
+      darkMode: 'class',
+    }
+  </script>
   <style>
     .post-content img { max-width: 100%; height: auto; border-radius: 0.5rem; }
     .post-content video { max-width: 100%; height: auto; border-radius: 0.5rem; }
     
     /* Comment depth styling with colored borders */
     .comment-depth-0 { margin-left: 0; padding: 0.75rem; background: #f9fafb; border-radius: 0.5rem; margin-bottom: 0.75rem; }
+    .dark .comment-depth-0 { background: #1f2937; }
     .comment-depth-1 { margin-left: 1rem; border-left: 3px solid #fb923c; padding-left: 0.75rem; padding-top: 0.5rem; padding-bottom: 0.5rem; }
     .comment-depth-2 { margin-left: 1rem; border-left: 3px solid #38bdf8; padding-left: 0.75rem; padding-top: 0.5rem; padding-bottom: 0.5rem; }
     .comment-depth-3 { margin-left: 1rem; border-left: 3px solid #4ade80; padding-left: 0.75rem; padding-top: 0.5rem; padding-bottom: 0.5rem; }
@@ -28,23 +35,38 @@
     
     .comment-body { line-height: 1.6; }
     .comment-body a { color: #ea580c; text-decoration: underline; }
+    .dark .comment-body a { color: #fb923c; }
     .comment-body p { margin-bottom: 0.75rem; }
     .comment-body pre { background: #f3f4f6; padding: 0.75rem; border-radius: 0.375rem; overflow-x: auto; font-size: 0.875rem; }
+    .dark .comment-body pre { background: #374151; color: #e5e7eb; }
     .comment-body code { background: #f3f4f6; padding: 0.125rem 0.375rem; border-radius: 0.25rem; font-size: 0.875em; font-family: monospace; }
+    .dark .comment-body code { background: #374151; color: #e5e7eb; }
     .comment-body ul, .comment-body ol { margin-left: 1.5rem; margin-bottom: 0.75rem; }
     .comment-body li { margin-bottom: 0.25rem; }
   </style>
+  <script>
+    // Dark mode initialization - runs immediately to prevent flash
+    (function() {
+      const darkMode = localStorage.getItem('darkMode') === 'true';
+      if (darkMode) {
+        document.documentElement.classList.add('dark');
+      }
+    })();
+  </script>
 </head>
-<body class="bg-gray-50 min-h-screen">
-  <header class="bg-white border-b sticky top-0 z-10 shadow-sm">
+<body class="bg-gray-50 dark:bg-gray-900 min-h-screen transition-colors">
+  <header class="bg-white dark:bg-gray-800 border-b dark:border-gray-700 sticky top-0 z-10 shadow-sm">
     <div class="max-w-6xl mx-auto px-3 sm:px-4 py-3 sm:py-4">
       <div class="flex items-center justify-between">
         <div class="flex items-center gap-2 sm:gap-3">
-          <a href="/feed" class="text-lg sm:text-xl font-bold text-orange-600 hover:text-orange-700">← Mini-Reddit</a>
+          <a href="/feed" class="text-lg sm:text-xl font-bold text-orange-600 dark:text-orange-500 hover:text-orange-700 dark:hover:text-orange-400">← Mini-Reddit</a>
         </div>
         <div class="flex items-center gap-3 sm:gap-4 text-sm">
-          <span class="hidden sm:inline text-gray-600">Hi, <strong><%= username %></strong></span>
-          <a class="text-orange-600 hover:underline font-medium" href="/logout">Logout</a>
+          <button id="dark-mode-toggle" class="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors" aria-label="Toggle dark mode">
+            <span id="dark-mode-icon">🌙</span>
+          </button>
+          <span class="hidden sm:inline text-gray-600 dark:text-gray-300">Hi, <strong><%= username %></strong></span>
+          <a class="text-orange-600 dark:text-orange-500 hover:underline font-medium" href="/logout">Logout</a>
         </div>
       </div>
     </div>
@@ -52,10 +74,10 @@
 
   <main class="max-w-4xl mx-auto px-3 sm:px-4 py-4 sm:py-6">
     <!-- Post Card -->
-    <article class="bg-white rounded-lg shadow-sm mb-4 sm:mb-6 overflow-hidden">
+    <article class="bg-white dark:bg-gray-800 rounded-lg shadow-sm mb-4 sm:mb-6 overflow-hidden">
       <div class="p-4 sm:p-6">
-        <div class="flex items-center gap-2 text-xs text-gray-500 mb-3">
-          <a href="/feed" class="font-semibold text-orange-600 hover:underline">r/<%= post.subreddit %></a>
+        <div class="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400 mb-3">
+          <a href="/feed" class="font-semibold text-orange-600 dark:text-orange-500 hover:underline">r/<%= post.subreddit %></a>
           <span>•</span>
           <span>Posted by u/<%= post.author %></span>
           <span>•</span>
@@ -63,11 +85,11 @@
           <span class="sm:hidden"><%= new Date(post.createdUtc * 1000).toLocaleDateString() %></span>
         </div>
 
-        <h1 class="text-xl sm:text-2xl font-bold text-gray-900 mb-4"><%= post.title %></h1>
+        <h1 class="text-xl sm:text-2xl font-bold text-gray-900 dark:text-gray-100 mb-4"><%= post.title %></h1>
 
         <div class="post-content mb-4">
           <% if (post.selftext && post.selftext.length > 0) { %>
-            <div class="prose prose-sm sm:prose max-w-none text-gray-700 whitespace-pre-wrap mb-4"><%= post.selftext %></div>
+            <div class="prose prose-sm sm:prose max-w-none text-gray-700 dark:text-gray-300 whitespace-pre-wrap mb-4"><%= post.selftext %></div>
           <% } %>
 
           <% if (post.hasImage && post.imageUrl) { %>
@@ -120,16 +142,16 @@
           <% } %>
 
           <% if (post.url && !post.url.includes('reddit.com') && !post.hasImage && !post.hasVideo && !post.hasGallery) { %>
-            <div class="bg-gray-100 p-3 rounded-lg text-sm">
-              <span class="text-gray-600">External link:</span>
-              <a href="<%= post.url %>" target="_blank" rel="noreferrer" class="text-orange-600 hover:underline break-all ml-2">
+            <div class="bg-gray-100 dark:bg-gray-700 p-3 rounded-lg text-sm">
+              <span class="text-gray-600 dark:text-gray-300">External link:</span>
+              <a href="<%= post.url %>" target="_blank" rel="noreferrer" class="text-orange-600 dark:text-orange-500 hover:underline break-all ml-2">
                 <%= post.url %>
               </a>
             </div>
           <% } %>
         </div>
 
-        <div class="flex items-center gap-4 text-sm text-gray-600 pt-3 border-t">
+        <div class="flex items-center gap-4 text-sm text-gray-600 dark:text-gray-400 pt-3 border-t dark:border-gray-700">
           <span class="flex items-center gap-1 font-medium">
             <span>⬆️</span>
             <span><%= post.score %> upvotes</span>
@@ -143,14 +165,14 @@
     </article>
 
     <!-- Comments Section -->
-    <div class="bg-white rounded-lg shadow-sm p-4 sm:p-6">
+    <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-4 sm:p-6">
       <div class="flex items-center gap-2 mb-6">
-        <h2 class="text-lg sm:text-xl font-bold text-gray-900">💬 Comments</h2>
-        <span class="text-sm text-gray-500">(<%= comments ? comments.length : 0 %> top-level)</span>
+        <h2 class="text-lg sm:text-xl font-bold text-gray-900 dark:text-gray-100">💬 Comments</h2>
+        <span class="text-sm text-gray-500 dark:text-gray-400">(<%= comments ? comments.length : 0 %> top-level)</span>
       </div>
       
       <% if (!comments || comments.length === 0) { %>
-        <div class="text-center py-8 text-gray-500">
+        <div class="text-center py-8 text-gray-500 dark:text-gray-400">
           <p class="text-lg mb-1">No comments yet</p>
           <p class="text-sm">Be the first to comment!</p>
         </div>
@@ -159,17 +181,17 @@
           <%
             function renderComment(comment) {
               const depthClass = `comment-depth-${Math.min(comment.depth, 5)}`;
-              const scoreColor = comment.score > 100 ? 'text-orange-600 font-bold' : comment.score > 10 ? 'text-orange-500 font-semibold' : 'text-gray-600';
+              const scoreColor = comment.score > 100 ? 'text-orange-600 dark:text-orange-500 font-bold' : comment.score > 10 ? 'text-orange-500 dark:text-orange-400 font-semibold' : 'text-gray-600 dark:text-gray-400';
           %>
             <div class="<%= depthClass %>">
               <div class="flex items-center gap-2 mb-2">
-                <span class="text-sm font-bold text-gray-800">u/<%= comment.author %></span>
+                <span class="text-sm font-bold text-gray-800 dark:text-gray-200">u/<%= comment.author %></span>
                 <span class="text-xs <%= scoreColor %> flex items-center gap-1">
                   <span>⬆️</span>
                   <span><%= comment.score %></span>
                 </span>
               </div>
-              <div class="text-sm text-gray-900 comment-body"><%= comment.body %></div>
+              <div class="text-sm text-gray-900 dark:text-gray-300 comment-body"><%= comment.body %></div>
               
               <% if (comment.replies && comment.replies.length > 0) { %>
                 <div class="mt-2 space-y-1">
@@ -190,10 +212,31 @@
     </div>
   </main>
 
-  <footer class="text-center text-xs text-gray-500 py-6 mt-8">
+  <footer class="text-center text-xs text-gray-500 dark:text-gray-400 py-6 mt-8">
     <p>Powered by Reddit JSON API • Self-hosted • No tracking</p>
   </footer>
   <link rel="stylesheet" href="/public/styles.css" />
+  <script>
+    // Dark mode toggle functionality
+    (function() {
+      const toggle = document.getElementById('dark-mode-toggle');
+      const icon = document.getElementById('dark-mode-icon');
+      
+      function updateIcon(isDark) {
+        icon.textContent = isDark ? '☀️' : '🌙';
+      }
+      
+      // Set initial icon
+      const isDark = document.documentElement.classList.contains('dark');
+      updateIcon(isDark);
+      
+      toggle.addEventListener('click', function() {
+        const isDark = document.documentElement.classList.toggle('dark');
+        localStorage.setItem('darkMode', isDark);
+        updateIcon(isDark);
+      });
+    })();
+  </script>
 </body>
 </html>
 

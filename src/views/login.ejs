@@ -5,52 +5,67 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title><%= title %></title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    // Tailwind dark mode configuration
+    tailwind.config = {
+      darkMode: 'class',
+    }
+  </script>
+  <script>
+    // Dark mode initialization - runs immediately to prevent flash
+    (function() {
+      const darkMode = localStorage.getItem('darkMode') === 'true';
+      if (darkMode) {
+        document.documentElement.classList.add('dark');
+      }
+    })();
+  </script>
 </head>
-<body class="bg-gradient-to-br from-orange-50 to-orange-100 min-h-screen">
+<body class="bg-gradient-to-br from-orange-50 to-orange-100 dark:from-gray-900 dark:to-gray-800 min-h-screen transition-colors">
   <div class="min-h-screen flex items-center justify-center px-4">
     <div class="w-full max-w-md">
-      <div class="bg-white shadow-lg rounded-lg p-6 sm:p-8">
+      <div class="bg-white dark:bg-gray-800 shadow-lg rounded-lg p-6 sm:p-8">
         <div class="text-center mb-6">
-          <h1 class="text-3xl font-bold text-orange-600 mb-2">Mini-Reddit</h1>
-          <p class="text-sm text-gray-600">Your personal, ad-free Reddit viewer</p>
+          <h1 class="text-3xl font-bold text-orange-600 dark:text-orange-500 mb-2">Mini-Reddit</h1>
+          <p class="text-sm text-gray-600 dark:text-gray-400">Your personal, ad-free Reddit viewer</p>
         </div>
         
         <% if (typeof error !== 'undefined' && error) { %>
-          <div class="mb-4 p-3 bg-red-50 border border-red-200 text-red-700 rounded-lg text-sm">
+          <div class="mb-4 p-3 bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-800 text-red-700 dark:text-red-400 rounded-lg text-sm">
             <strong>Error:</strong> <%= error %>
           </div>
         <% } %>
         
         <form method="post" action="/login" class="space-y-4">
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">Username</label>
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Username</label>
             <input 
               name="username" 
               type="text" 
               required 
               autofocus
-              class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all" 
+              class="w-full border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all" 
             />
           </div>
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">Password</label>
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Password</label>
             <input 
               name="password" 
               type="password" 
               required 
-              class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all" 
+              class="w-full border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all" 
             />
           </div>
           <button 
             type="submit" 
-            class="w-full bg-orange-600 hover:bg-orange-700 text-white font-semibold rounded-lg px-4 py-3 transition-colors shadow-sm hover:shadow-md"
+            class="w-full bg-orange-600 hover:bg-orange-700 dark:bg-orange-700 dark:hover:bg-orange-600 text-white font-semibold rounded-lg px-4 py-3 transition-colors shadow-sm hover:shadow-md"
           >
             Login
           </button>
         </form>
         
-        <div class="mt-6 pt-6 border-t border-gray-200">
-          <p class="text-xs text-gray-500 text-center">
+        <div class="mt-6 pt-6 border-t border-gray-200 dark:border-gray-700">
+          <p class="text-xs text-gray-500 dark:text-gray-400 text-center">
             🔒 Self-hosted • No tracking • No ads
           </p>
         </div>
@@ -58,7 +73,7 @@
     </div>
   </div>
   
-  <footer class="fixed bottom-0 left-0 right-0 text-center text-xs text-gray-600 py-4">
+  <footer class="fixed bottom-0 left-0 right-0 text-center text-xs text-gray-600 dark:text-gray-400 py-4">
     <p>Powered by Reddit JSON API</p>
   </footer>
   <link rel="stylesheet" href="/public/styles.css" />
