@@ -1,0 +1,8 @@
+# nixpacks.toml
+providers = ["bun"]
+
+[phases.install]
+cmds = ["bun install --production --frozen-lockfile"]
+
+[start]
+cmd = "bun src/server.js"
