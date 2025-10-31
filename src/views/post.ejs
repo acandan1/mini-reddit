@@ -15,34 +15,86 @@
     .post-content img { max-width: 100%; height: auto; border-radius: 0.5rem; }
     .post-content video { max-width: 100%; height: auto; border-radius: 0.5rem; }
     
-    /* Comment depth styling with colored borders */
-    .comment-depth-0 { margin-left: 0; padding: 0.75rem; background: #f9fafb; border-radius: 0.5rem; margin-bottom: 0.75rem; }
+    /* Comment depth styling - consistent colored borders for threading */
+    .comment-depth-0 { margin-left: 0; padding: 0.75rem; background: #f9fafb; border-radius: 0.5rem; margin-bottom: 0.75rem; max-width: 100%; box-sizing: border-box; overflow-wrap: break-word; }
     .dark .comment-depth-0 { background: #111827; }
-    .comment-depth-1 { margin-left: 1rem; border-left: 3px solid #fb923c; padding-left: 0.75rem; padding-top: 0.5rem; padding-bottom: 0.5rem; }
-    .comment-depth-2 { margin-left: 1rem; border-left: 3px solid #38bdf8; padding-left: 0.75rem; padding-top: 0.5rem; padding-bottom: 0.5rem; }
-    .comment-depth-3 { margin-left: 1rem; border-left: 3px solid #4ade80; padding-left: 0.75rem; padding-top: 0.5rem; padding-bottom: 0.5rem; }
-    .comment-depth-4 { margin-left: 1rem; border-left: 3px solid #a78bfa; padding-left: 0.75rem; padding-top: 0.5rem; padding-bottom: 0.5rem; }
-    .comment-depth-5 { margin-left: 1rem; border-left: 3px solid #f472b6; padding-left: 0.75rem; padding-top: 0.5rem; padding-bottom: 0.5rem; }
+    .comment-depth-1, .comment-depth-2, .comment-depth-3, .comment-depth-4, .comment-depth-5 { 
+      margin-left: 1rem; 
+      border-left: 3px solid #9ca3af;
+      padding-left: 0.75rem; 
+      padding-top: 0.5rem; 
+      padding-bottom: 0.5rem; 
+      max-width: 100%; 
+      box-sizing: border-box; 
+      overflow-wrap: break-word;
+    }
+    .dark .comment-depth-1, .dark .comment-depth-2, .dark .comment-depth-3, .dark .comment-depth-4, .dark .comment-depth-5 {
+      border-left-color: #6b7280;
+    }
     
     @media (max-width: 640px) {
       .comment-depth-0 { padding: 0.5rem; margin-bottom: 0.5rem; }
       .comment-depth-1, .comment-depth-2, .comment-depth-3, .comment-depth-4, .comment-depth-5 { 
         margin-left: 0.5rem; 
-        padding-left: 0.5rem; 
+        padding-left: 0.5rem;
         border-left-width: 2px;
       }
     }
     
-    .comment-body { line-height: 1.6; }
-    .comment-body a { color: #ea580c; text-decoration: underline; }
+    .comment-body { line-height: 1.6; word-wrap: break-word; overflow-wrap: break-word; }
+    .comment-body a { color: #ea580c; text-decoration: underline; word-break: break-all; }
     .dark .comment-body a { color: #fb923c; }
-    .comment-body p { margin-bottom: 0.75rem; }
-    .comment-body pre { background: #f3f4f6; padding: 0.75rem; border-radius: 0.375rem; overflow-x: auto; font-size: 0.875rem; }
+    .comment-body p { margin-bottom: 0.75rem; word-wrap: break-word; overflow-wrap: break-word; }
+    .comment-body pre { background: #f3f4f6; padding: 0.75rem; border-radius: 0.375rem; overflow-x: auto; font-size: 0.875rem; word-wrap: break-word; overflow-wrap: break-word; }
     .dark .comment-body pre { background: #1f2937; color: #e5e7eb; }
-    .comment-body code { background: #f3f4f6; padding: 0.125rem 0.375rem; border-radius: 0.25rem; font-size: 0.875em; font-family: monospace; }
+    .comment-body code { background: #f3f4f6; padding: 0.125rem 0.375rem; border-radius: 0.25rem; font-size: 0.875em; font-family: monospace; word-wrap: break-word; overflow-wrap: break-word; }
     .dark .comment-body code { background: #1f2937; color: #e5e7eb; }
     .comment-body ul, .comment-body ol { margin-left: 1.5rem; margin-bottom: 0.75rem; }
     .comment-body li { margin-bottom: 0.25rem; }
+    
+    /* Prevent text overflow */
+    .comment-body, .comment-body * { max-width: 100%; box-sizing: border-box; }
+    
+    /* Comment header - prevent overflow */
+    .comment-header { 
+      display: flex; 
+      align-items: center; 
+      gap: 0.5rem; 
+      flex-wrap: wrap;
+      min-width: 0; /* Allow flex items to shrink below their content size */
+    }
+    .comment-username { 
+      word-wrap: break-word; 
+      overflow-wrap: break-word; 
+      word-break: break-all;
+      min-width: 0; /* Allow username to shrink */
+      flex-shrink: 1;
+      max-width: 100%;
+    }
+    .comment-score { 
+      flex-shrink: 0; /* Don't shrink the score */
+      white-space: nowrap;
+    }
+    
+    /* Collapsible comment styles */
+    .comment-toggle { 
+      cursor: pointer; 
+      user-select: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.25rem;
+      font-size: 0.75rem;
+      color: #6b7280;
+      margin-right: 0.5rem;
+      flex-shrink: 0; /* Don't shrink the toggle button */
+    }
+    .dark .comment-toggle { color: #9ca3af; }
+    .comment-toggle:hover { color: #ea580c; }
+    .dark .comment-toggle:hover { color: #fb923c; }
+    .comment-content { transition: opacity 0.2s; }
+    .comment-content.collapsed { display: none; }
+    .comment-toggle-icon { display: inline-block; transition: transform 0.2s; }
+    .comment-toggle-icon.collapsed { transform: rotate(-90deg); }
   </style>
   <script>
     // Dark mode initialization - runs immediately to prevent flash
@@ -179,27 +231,35 @@
       <% } else { %>
         <div class="space-y-1">
           <%
+            let commentIdCounter = 0;
             function renderComment(comment) {
               const depthClass = `comment-depth-${Math.min(comment.depth, 5)}`;
               const scoreColor = comment.score > 100 ? 'text-orange-600 dark:text-orange-500 font-bold' : comment.score > 10 ? 'text-orange-500 dark:text-orange-400 font-semibold' : 'text-gray-600 dark:text-gray-400';
+              const commentId = `comment-${commentIdCounter++}`;
+              const hasReplies = comment.replies && comment.replies.length > 0;
           %>
             <div class="<%= depthClass %>">
-              <div class="flex items-center gap-2 mb-2">
-                <span class="text-sm font-bold text-gray-800 dark:text-gray-200">u/<%= comment.author %></span>
-                <span class="text-xs <%= scoreColor %> flex items-center gap-1">
+              <div class="comment-header mb-2">
+                <button class="comment-toggle" onclick="toggleComment('<%= commentId %>')" aria-label="Toggle comment">
+                  <span class="comment-toggle-icon" id="<%= commentId %>-icon">▼</span>
+                </button>
+                <span class="comment-username text-sm font-bold text-gray-800 dark:text-gray-200">u/<%= comment.author %></span>
+                <span class="comment-score text-xs <%= scoreColor %> flex items-center gap-1">
                   <span>⬆️</span>
                   <span><%= comment.score %></span>
                 </span>
               </div>
-              <div class="text-sm text-gray-900 dark:text-gray-300 comment-body"><%= comment.body %></div>
-              
-              <% if (comment.replies && comment.replies.length > 0) { %>
-                <div class="mt-2 space-y-1">
-                  <% comment.replies.forEach(function(reply) { %>
-                    <% renderComment(reply); %>
-                  <% }); %>
-                </div>
-              <% } %>
+              <div class="comment-content" id="<%= commentId %>-content">
+                <div class="text-sm text-gray-900 dark:text-gray-300 comment-body"><%= comment.body %></div>
+                
+                <% if (hasReplies) { %>
+                  <div class="mt-2 space-y-1">
+                    <% comment.replies.forEach(function(reply) { %>
+                      <% renderComment(reply); %>
+                    <% }); %>
+                  </div>
+                <% } %>
+              </div>
             </div>
           <%
             }
@@ -236,6 +296,24 @@
         updateIcon(isDark);
       });
     })();
+    
+    // Comment collapse/expand functionality
+    function toggleComment(commentId) {
+      const content = document.getElementById(commentId + '-content');
+      const icon = document.getElementById(commentId + '-icon');
+      
+      if (content && icon) {
+        const isCollapsed = content.classList.contains('collapsed');
+        
+        if (isCollapsed) {
+          content.classList.remove('collapsed');
+          icon.classList.remove('collapsed');
+        } else {
+          content.classList.add('collapsed');
+          icon.classList.add('collapsed');
+        }
+      }
+    }
   </script>
 </body>
 </html>
