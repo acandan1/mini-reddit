@@ -31,8 +31,59 @@
   </header>
 
   <main class="max-w-6xl mx-auto px-3 sm:px-4 py-4 sm:py-6">
+    <!-- Mobile subreddits (visible on small screens, above the feed) -->
+    <div class="lg:hidden mb-3 sm:mb-4">
+      <div class="bg-white rounded-lg shadow-sm p-3">
+        <div class="flex items-center justify-between mb-2">
+          <h2 class="text-sm font-semibold text-gray-800 flex items-center gap-2">
+            <span>📚</span>
+            <span>Your Subreddits</span>
+          </h2>
+          <a href="/feed" class="text-xs font-medium text-orange-600 hover:text-orange-700">🏠 All</a>
+        </div>
+        <div class="flex gap-2 overflow-x-auto pb-1 -mx-1 px-1">
+          <% (subreddits || []).slice(0, 5).forEach(function(s) { %>
+            <a href="/r/<%= s %>" class="px-3 py-1.5 bg-gray-100 rounded-full text-sm text-gray-700 whitespace-nowrap hover:bg-orange-100 hover:text-orange-700 transition-colors">r/<%= s %></a>
+          <% }) %>
+          <% if ((subreddits || []).length > 5) { %>
+            <button type="button" id="more-subs-toggle" class="px-3 py-1.5 bg-orange-50 text-orange-700 rounded-full text-sm whitespace-nowrap border border-orange-200">+<%= (subreddits || []).length - 5 %> more</button>
+          <% } %>
+        </div>
+        <% if ((subreddits || []).length > 5) { %>
+          <div id="more-subs-list" class="mt-2 hidden">
+            <ul class="grid grid-cols-2 gap-2">
+              <% (subreddits || []).slice(5).forEach(function(s) { %>
+                <li>
+                  <a href="/r/<%= s %>" class="block px-3 py-2 bg-gray-50 rounded-lg text-sm text-gray-700 hover:bg-orange-50 hover:text-orange-700 transition-colors">r/<%= s %></a>
+                </li>
+              <% }) %>
+            </ul>
+          </div>
+          <script>
+            (function() {
+              const btn = document.getElementById('more-subs-toggle');
+              const list = document.getElementById('more-subs-list');
+              if (btn && list) {
+                const moreLabel = '+<%= (subreddits || []).length - 5 %> more';
+                const lessLabel = 'Show less';
+                btn.addEventListener('click', function() {
+                  const isHidden = list.classList.contains('hidden');
+                  if (isHidden) {
+                    list.classList.remove('hidden');
+                    btn.textContent = lessLabel;
+                  } else {
+                    list.classList.add('hidden');
+                    btn.textContent = moreLabel;
+                  }
+                });
+              }
+            })();
+          </script>
+        <% } %>
+      </div>
+    </div>
     <div class="grid grid-cols-1 lg:grid-cols-12 gap-4 sm:gap-6">
-      <aside class="lg:col-span-3 order-2 lg:order-1">
+      <aside class="hidden lg:block lg:col-span-3 order-2 lg:order-1">
         <div class="bg-white rounded-lg shadow-sm p-4 sticky top-20">
           <h2 class="font-semibold text-gray-800 mb-3 flex items-center gap-2">
             <span>📚</span>
