@@ -28,7 +28,7 @@ if (!fs.existsSync(publicDir)) {
 const viewsDir = path.join(__dirname, 'views');
 const configPath = path.join(__dirname, 'config.json');
 
-const app = fastify({ logger: true });
+const app = fastify({ logger: true, trustProxy: true });
 
 await app.register(formbody);
 await app.register(fastifyCookie);
@@ -36,7 +36,7 @@ await app.register(fastifySession, {
   secret: SESSION_SECRET,
   cookieName: 'mini_reddit_sid',
   cookie: {
-    secure: IS_PROD,
+    secure: 'auto',
     httpOnly: true,
     sameSite: 'lax',
     path: '/',
