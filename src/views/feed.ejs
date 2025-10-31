@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title><%= title %></title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50">
+  <header class="bg-white border-b">
+    <div class="max-w-5xl mx-auto px-4 py-4 flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <a href="/feed" class="text-xl font-semibold">Mini-Reddit</a>
+        <span class="text-gray-400">|</span>
+        <form method="post" action="/subs/add" class="flex items-center gap-2">
+          <input name="subreddit" placeholder="Add subreddit" class="border rounded px-3 py-1" />
+          <button class="bg-green-600 hover:bg-green-700 text-white rounded px-3 py-1">Add</button>
+        </form>
+      </div>
+      <div class="flex items-center gap-4">
+        <span class="text-sm text-gray-600">Hi, <%= username %></span>
+        <a class="text-sm text-blue-600 hover:underline" href="/logout">Logout</a>
+      </div>
+    </div>
+  </header>
+
+  <main class="max-w-5xl mx-auto px-4 py-6 grid grid-cols-12 gap-6">
+    <aside class="col-span-12 lg:col-span-3">
+      <div class="bg-white rounded shadow p-4">
+        <h2 class="font-semibold mb-3">Your Subreddits</h2>
+        <ul class="space-y-2">
+          <% subreddits.forEach(function(s) { %>
+            <li class="flex items-center justify-between text-sm">
+              <a class="text-blue-700 hover:underline" href="https://www.reddit.com/r/<%= s %>" target="_blank" rel="noreferrer">r/<%= s %></a>
+              <form method="post" action="/subs/remove">
+                <input type="hidden" name="subreddit" value="<%= s %>" />
+                <button class="text-red-600 hover:underline">remove</button>
+              </form>
+            </li>
+          <% }) %>
+        </ul>
+      </div>
+    </aside>
+    <section class="col-span-12 lg:col-span-9 space-y-4">
+      <% if (!posts.length) { %>
+        <div class="text-gray-500">No posts yet. Try adding a subreddit.</div>
+      <% } %>
+      <% posts.forEach(function(p) { %>
+        <article class="bg-white rounded shadow p-4">
+          <div class="text-xs text-gray-500 mb-1">r/<%= p.subreddit %> • by u/<%= p.author %></div>
+          <h3 class="text-lg font-semibold mb-2">
+            <a class="hover:underline" href="<%= p.url %>" target="_blank" rel="noreferrer"><%= p.title %></a>
+          </h3>
+          <div class="text-sm text-gray-600 flex items-center gap-3">
+            <a class="text-blue-700 hover:underline" href="<%= p.permalink %>" target="_blank" rel="noreferrer">comments (<%= p.numComments %>)</a>
+            <span>score: <%= p.score %></span>
+            <span><%= new Date(p.createdUtc * 1000).toLocaleString() %></span>
+          </div>
+        </article>
+      <% }) %>
+    </section>
+  </main>
+
+  <footer class="text-center text-xs text-gray-500 py-6">Powered by Reddit JSON API</footer>
+  <link rel="stylesheet" href="/public/styles.css" />
+</body>
+</html>
+
+

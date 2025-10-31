@@ -121,8 +121,6 @@ cd mini-reddit
 
 ```bash
 bun install
-# or
-npm install
 ```
 
 ### 3. Create your `.env` file
