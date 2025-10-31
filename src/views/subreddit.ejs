@@ -40,11 +40,11 @@
           </h2>
           <ul class="space-y-2 max-h-96 overflow-y-auto">
             <li class="mb-3 pb-3 border-b">
-              <a href="/feed" class="text-sm font-bold text-orange-600">🏠 All Feed</a>
+              <a href="/feed" class="text-sm font-medium text-orange-600 hover:text-orange-700">🏠 All Feed</a>
             </li>
             <% subreddits.forEach(function(s) { %>
-              <li class="flex items-center justify-between text-sm group">
-                <a href="/r/<%= s %>" class="text-gray-700 font-medium hover:text-orange-600 transition-colors">r/<%= s %></a>
+              <li class="flex items-center justify-between text-sm group <%= currentSubreddit && s.toLowerCase() === currentSubreddit.toLowerCase() ? 'bg-orange-50 -mx-2 px-2 py-1 rounded' : '' %>">
+                <a href="/r/<%= s %>" class="<%= currentSubreddit && s.toLowerCase() === currentSubreddit.toLowerCase() ? 'text-orange-600 font-bold' : 'text-gray-700 font-medium hover:text-orange-600' %>">r/<%= s %></a>
                 <form method="post" action="/subs/remove" class="inline">
                   <input type="hidden" name="subreddit" value="<%= s %>" />
                   <button class="text-red-500 hover:text-red-700 opacity-60 group-hover:opacity-100 transition-opacity text-xs">✕</button>
@@ -56,28 +56,34 @@
       </aside>
       
       <section class="lg:col-span-9 order-1 lg:order-2">
+        <!-- Subreddit Header -->
+        <div class="bg-gradient-to-r from-orange-600 to-orange-500 text-white rounded-lg shadow-sm p-6 mb-4">
+          <h1 class="text-2xl sm:text-3xl font-bold mb-2">r/<%= currentSubreddit %></h1>
+          <p class="text-orange-100 text-sm"><%= posts.length %> <%= currentSort %> posts</p>
+        </div>
+
         <!-- Sorting Controls -->
         <div class="bg-white rounded-lg shadow-sm p-3 sm:p-4 mb-3 sm:mb-4">
           <div class="flex flex-col sm:flex-row sm:items-center gap-3">
             <span class="text-sm font-semibold text-gray-700">Sort by:</span>
             <div class="flex flex-wrap gap-2">
-              <a href="/feed?sort=hot<%= currentSort === 'top' || currentSort === 'controversial' ? '&t=' + currentTimeframe : '' %>" 
+              <a href="/r/<%= currentSubreddit %>?sort=hot<%= currentSort === 'top' || currentSort === 'controversial' ? '&t=' + currentTimeframe : '' %>" 
                  class="px-3 py-1.5 rounded-lg text-sm font-medium transition-colors <%= currentSort === 'hot' ? 'bg-orange-600 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200' %>">
                 🔥 Hot
               </a>
-              <a href="/feed?sort=new" 
+              <a href="/r/<%= currentSubreddit %>?sort=new" 
                  class="px-3 py-1.5 rounded-lg text-sm font-medium transition-colors <%= currentSort === 'new' ? 'bg-orange-600 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200' %>">
                 🆕 New
               </a>
-              <a href="/feed?sort=top&t=<%= currentTimeframe %>" 
+              <a href="/r/<%= currentSubreddit %>?sort=top&t=<%= currentTimeframe %>" 
                  class="px-3 py-1.5 rounded-lg text-sm font-medium transition-colors <%= currentSort === 'top' ? 'bg-orange-600 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200' %>">
                 ⬆️ Top
               </a>
-              <a href="/feed?sort=rising" 
+              <a href="/r/<%= currentSubreddit %>?sort=rising" 
                  class="px-3 py-1.5 rounded-lg text-sm font-medium transition-colors <%= currentSort === 'rising' ? 'bg-orange-600 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200' %>">
                 📈 Rising
               </a>
-              <a href="/feed?sort=controversial&t=<%= currentTimeframe %>" 
+              <a href="/r/<%= currentSubreddit %>?sort=controversial&t=<%= currentTimeframe %>" 
                  class="px-3 py-1.5 rounded-lg text-sm font-medium transition-colors <%= currentSort === 'controversial' ? 'bg-orange-600 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200' %>">
                 ⚡ Controversial
               </a>
@@ -85,7 +91,7 @@
             <% if (currentSort === 'top' || currentSort === 'controversial') { %>
               <div class="flex items-center gap-2 sm:ml-auto">
                 <span class="text-sm text-gray-600">from:</span>
-                <select onchange="window.location.href='/feed?sort=<%= currentSort %>&t=' + this.value" 
+                <select onchange="window.location.href='/r/<%= currentSubreddit %>?sort=<%= currentSort %>&t=' + this.value" 
                         class="text-sm border border-gray-300 rounded px-2 py-1 focus:outline-none focus:ring-2 focus:ring-orange-500">
                   <option value="hour" <%= currentTimeframe === 'hour' ? 'selected' : '' %>>Past Hour</option>
                   <option value="day" <%= currentTimeframe === 'day' ? 'selected' : '' %>>Today</option>
@@ -99,69 +105,68 @@
           </div>
         </div>
 
+        <!-- Posts -->
         <div class="space-y-3 sm:space-y-4">
           <% if (!posts.length) { %>
             <div class="bg-white rounded-lg shadow-sm p-8 text-center text-gray-500">
-              <p class="text-lg mb-2">No posts yet.</p>
-              <p class="text-sm">Try adding a subreddit to get started!</p>
+              <p class="text-lg mb-2">No posts found.</p>
+              <p class="text-sm">This subreddit might be empty or unavailable.</p>
             </div>
           <% } %>
-        <% posts.forEach(function(p) { %>
-          <article class="bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow overflow-hidden">
-            <div class="p-3 sm:p-4">
-              <div class="flex items-center gap-2 text-xs text-gray-500 mb-2">
-                <span class="font-semibold text-orange-600">r/<%= p.subreddit %></span>
-                <span>•</span>
-                <span>u/<%= p.author %></span>
-                <span>•</span>
-                <span class="hidden sm:inline"><%= new Date(p.createdUtc * 1000).toLocaleString() %></span>
-                <span class="sm:hidden"><%= new Date(p.createdUtc * 1000).toLocaleDateString() %></span>
+          <% posts.forEach(function(p) { %>
+            <article class="bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow overflow-hidden">
+              <div class="p-3 sm:p-4">
+                <div class="flex items-center gap-2 text-xs text-gray-500 mb-2">
+                  <span>u/<%= p.author %></span>
+                  <span>•</span>
+                  <span class="hidden sm:inline"><%= new Date(p.createdUtc * 1000).toLocaleString() %></span>
+                  <span class="sm:hidden"><%= new Date(p.createdUtc * 1000).toLocaleDateString() %></span>
+                </div>
+                
+                <a href="/post/<%= p.subreddit %>/<%= p.id %>" class="block group">
+                  <h3 class="text-base sm:text-lg font-semibold text-gray-900 mb-2 group-hover:text-orange-600 transition-colors line-clamp-3">
+                    <%= p.title %>
+                  </h3>
+                </a>
+
+                <% if (p.selftext && p.selftext.length > 0 && p.selftext.length < 300) { %>
+                  <p class="text-sm text-gray-600 mb-3 line-clamp-3"><%= p.selftext %></p>
+                <% } %>
+
+                <% if (p.hasImage && p.imageUrl) { %>
+                  <a href="/post/<%= p.subreddit %>/<%= p.id %>" class="block mb-3">
+                    <img src="<%= p.imageUrl %>" alt="Post image" class="max-h-96 w-auto mx-auto rounded-lg" loading="lazy" />
+                  </a>
+                <% } else if (p.hasVideo && p.videoUrl) { %>
+                  <a href="/post/<%= p.subreddit %>/<%= p.id %>" class="block mb-3">
+                    <video controls class="max-h-96 w-auto mx-auto rounded-lg" preload="metadata">
+                      <source src="<%= p.videoUrl %>" type="video/mp4" />
+                    </video>
+                  </a>
+                <% } else if (p.hasGallery && p.galleryItems.length > 0) { %>
+                  <a href="/post/<%= p.subreddit %>/<%= p.id %>" class="block mb-3">
+                    <img src="<%= p.galleryItems[0].url %>" alt="Gallery image" class="max-h-96 w-auto mx-auto rounded-lg" loading="lazy" />
+                    <p class="text-xs text-center text-gray-500 mt-1">Gallery (<%= p.galleryItems.length %> images)</p>
+                  </a>
+                <% } else if (p.thumbnailUrl && !p.thumbnailUrl.includes('self') && !p.thumbnailUrl.includes('default')) { %>
+                  <a href="/post/<%= p.subreddit %>/<%= p.id %>" class="block mb-3">
+                    <img src="<%= p.thumbnailUrl %>" alt="Thumbnail" class="max-h-32 w-auto rounded" loading="lazy" />
+                  </a>
+                <% } %>
+
+                <div class="flex items-center gap-3 sm:gap-4 text-xs sm:text-sm text-gray-600">
+                  <a href="/post/<%= p.subreddit %>/<%= p.id %>" class="text-orange-600 hover:text-orange-700 font-medium flex items-center gap-1">
+                    <span>💬</span>
+                    <span><%= p.numComments %> comments</span>
+                  </a>
+                  <span class="flex items-center gap-1">
+                    <span>⬆️</span>
+                    <span><%= p.score %></span>
+                  </span>
+                </div>
               </div>
-              
-              <a href="/post/<%= p.subreddit %>/<%= p.id %>" class="block group">
-                <h3 class="text-base sm:text-lg font-semibold text-gray-900 mb-2 group-hover:text-orange-600 transition-colors line-clamp-3">
-                  <%= p.title %>
-                </h3>
-              </a>
-
-              <% if (p.selftext && p.selftext.length > 0 && p.selftext.length < 300) { %>
-                <p class="text-sm text-gray-600 mb-3 line-clamp-3"><%= p.selftext %></p>
-              <% } %>
-
-              <% if (p.hasImage && p.imageUrl) { %>
-                <a href="/post/<%= p.subreddit %>/<%= p.id %>" class="block mb-3">
-                  <img src="<%= p.imageUrl %>" alt="Post image" class="max-h-96 w-auto mx-auto rounded-lg" loading="lazy" />
-                </a>
-              <% } else if (p.hasVideo && p.videoUrl) { %>
-                <a href="/post/<%= p.subreddit %>/<%= p.id %>" class="block mb-3">
-                  <video controls class="max-h-96 w-auto mx-auto rounded-lg" preload="metadata">
-                    <source src="<%= p.videoUrl %>" type="video/mp4" />
-                  </video>
-                </a>
-              <% } else if (p.hasGallery && p.galleryItems.length > 0) { %>
-                <a href="/post/<%= p.subreddit %>/<%= p.id %>" class="block mb-3">
-                  <img src="<%= p.galleryItems[0].url %>" alt="Gallery image" class="max-h-96 w-auto mx-auto rounded-lg" loading="lazy" />
-                  <p class="text-xs text-center text-gray-500 mt-1">Gallery (<%= p.galleryItems.length %> images)</p>
-                </a>
-              <% } else if (p.thumbnailUrl && !p.thumbnailUrl.includes('self') && !p.thumbnailUrl.includes('default')) { %>
-                <a href="/post/<%= p.subreddit %>/<%= p.id %>" class="block mb-3">
-                  <img src="<%= p.thumbnailUrl %>" alt="Thumbnail" class="max-h-32 w-auto rounded" loading="lazy" />
-                </a>
-              <% } %>
-
-              <div class="flex items-center gap-3 sm:gap-4 text-xs sm:text-sm text-gray-600">
-                <a href="/post/<%= p.subreddit %>/<%= p.id %>" class="text-orange-600 hover:text-orange-700 font-medium flex items-center gap-1">
-                  <span>💬</span>
-                  <span><%= p.numComments %> comments</span>
-                </a>
-                <span class="flex items-center gap-1">
-                  <span>⬆️</span>
-                  <span><%= p.score %></span>
-                </span>
-              </div>
-            </div>
-          </article>
-        <% }) %>
+            </article>
+          <% }) %>
         </div>
       </section>
     </div>
@@ -173,5 +178,4 @@
   <link rel="stylesheet" href="/public/styles.css" />
 </body>
 </html>
-
 

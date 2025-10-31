@@ -18,7 +18,10 @@ The app includes:
 * Persistent cookie-based authentication
 * Editable subreddit list (via the UI)
 * Server-side feed fetching & caching
-* Clean feed view (titles, links, top comments)
+* **Self-contained post viewing** — no external Reddit links needed
+* **Full comment threads** with nested replies
+* **Media embedding** — images, videos, and galleries display inline
+* Clean, modern, mobile-friendly UI with Tailwind CSS
 * Low resource usage (<50MB RAM idle)
 
 ---
@@ -103,8 +106,10 @@ PORT=3000
 | **Persistent Sessions**          | Cookies last for 30 days (configurable).              |
 | **Subreddit Management**         | Add/remove subs dynamically via UI.                   |
 | **Feed Caching**                 | Reduces redundant API calls (30 min default).         |
-| **Top Comments**                 | Optional: Fetch first few comments per post.          |
-| **Keyword Filtering (optional)** | Hide posts containing specific words (e.g. politics). |
+| **Post Viewing**                 | Click any post to view full content with comments.    |
+| **Comment Threads**              | Nested comment display with proper indentation.       |
+| **Media Embedding**              | Images, videos, and galleries display inline.         |
+| **Mobile-Friendly**              | Responsive design optimized for all screen sizes.     |
 
 ---
 
@@ -126,8 +131,17 @@ bun install
 ### 3. Create your `.env` file
 
 ```bash
-cp .env.example .env
+cp env.example .env
 # Edit credentials and session secret
+```
+
+Or create it manually with:
+
+```bash
+USERNAME=admin
+PASSWORD=supersecretpassword
+SESSION_SECRET=your_random_secret_change_me
+PORT=3000
 ```
 
 ### 4. Run the dev server
@@ -171,12 +185,23 @@ Expose via Nginx or directly through Coolify at a subdomain (e.g., `mini.yourdom
 
 ---
 
+## ✨ Features Implemented
+
+* ✅ Self-contained post viewing (no Reddit links needed)
+* ✅ Full comment threads with nested replies
+* ✅ Image, video, and gallery embedding
+* ✅ Mobile-responsive design
+* ✅ Sticky header navigation
+* ✅ Clean, modern UI with Tailwind CSS
+
 ## 🧪 Future Enhancements
 
-* [ ] Save “favorite” posts locally
+* [ ] Save "favorite" posts locally
 * [ ] Dark mode toggle
 * [ ] Comment voting filter (e.g., top 3 comments only)
 * [ ] Offline mode (cached JSON browsing)
 * [ ] RSS export (for your chosen subs)
+* [ ] Search within your feed
+* [ ] Filter by subreddit in feed view
 
 ---

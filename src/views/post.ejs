@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title><%= title %></title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    .post-content img { max-width: 100%; height: auto; border-radius: 0.5rem; }
+    .post-content video { max-width: 100%; height: auto; border-radius: 0.5rem; }
+    
+    /* Comment depth styling with colored borders */
+    .comment-depth-0 { margin-left: 0; padding: 0.75rem; background: #f9fafb; border-radius: 0.5rem; margin-bottom: 0.75rem; }
+    .comment-depth-1 { margin-left: 1rem; border-left: 3px solid #fb923c; padding-left: 0.75rem; padding-top: 0.5rem; padding-bottom: 0.5rem; }
+    .comment-depth-2 { margin-left: 1rem; border-left: 3px solid #38bdf8; padding-left: 0.75rem; padding-top: 0.5rem; padding-bottom: 0.5rem; }
+    .comment-depth-3 { margin-left: 1rem; border-left: 3px solid #4ade80; padding-left: 0.75rem; padding-top: 0.5rem; padding-bottom: 0.5rem; }
+    .comment-depth-4 { margin-left: 1rem; border-left: 3px solid #a78bfa; padding-left: 0.75rem; padding-top: 0.5rem; padding-bottom: 0.5rem; }
+    .comment-depth-5 { margin-left: 1rem; border-left: 3px solid #f472b6; padding-left: 0.75rem; padding-top: 0.5rem; padding-bottom: 0.5rem; }
+    
+    @media (max-width: 640px) {
+      .comment-depth-0 { padding: 0.5rem; margin-bottom: 0.5rem; }
+      .comment-depth-1, .comment-depth-2, .comment-depth-3, .comment-depth-4, .comment-depth-5 { 
+        margin-left: 0.5rem; 
+        padding-left: 0.5rem; 
+        border-left-width: 2px;
+      }
+    }
+    
+    .comment-body { line-height: 1.6; }
+    .comment-body a { color: #ea580c; text-decoration: underline; }
+    .comment-body p { margin-bottom: 0.75rem; }
+    .comment-body pre { background: #f3f4f6; padding: 0.75rem; border-radius: 0.375rem; overflow-x: auto; font-size: 0.875rem; }
+    .comment-body code { background: #f3f4f6; padding: 0.125rem 0.375rem; border-radius: 0.25rem; font-size: 0.875em; font-family: monospace; }
+    .comment-body ul, .comment-body ol { margin-left: 1.5rem; margin-bottom: 0.75rem; }
+    .comment-body li { margin-bottom: 0.25rem; }
+  </style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+  <header class="bg-white border-b sticky top-0 z-10 shadow-sm">
+    <div class="max-w-6xl mx-auto px-3 sm:px-4 py-3 sm:py-4">
+      <div class="flex items-center justify-between">
+        <div class="flex items-center gap-2 sm:gap-3">
+          <a href="/feed" class="text-lg sm:text-xl font-bold text-orange-600 hover:text-orange-700">← Mini-Reddit</a>
+        </div>
+        <div class="flex items-center gap-3 sm:gap-4 text-sm">
+          <span class="hidden sm:inline text-gray-600">Hi, <strong><%= username %></strong></span>
+          <a class="text-orange-600 hover:underline font-medium" href="/logout">Logout</a>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main class="max-w-4xl mx-auto px-3 sm:px-4 py-4 sm:py-6">
+    <!-- Post Card -->
+    <article class="bg-white rounded-lg shadow-sm mb-4 sm:mb-6 overflow-hidden">
+      <div class="p-4 sm:p-6">
+        <div class="flex items-center gap-2 text-xs text-gray-500 mb-3">
+          <a href="/feed" class="font-semibold text-orange-600 hover:underline">r/<%= post.subreddit %></a>
+          <span>•</span>
+          <span>Posted by u/<%= post.author %></span>
+          <span>•</span>
+          <span class="hidden sm:inline"><%= new Date(post.createdUtc * 1000).toLocaleString() %></span>
+          <span class="sm:hidden"><%= new Date(post.createdUtc * 1000).toLocaleDateString() %></span>
+        </div>
+
+        <h1 class="text-xl sm:text-2xl font-bold text-gray-900 mb-4"><%= post.title %></h1>
+
+        <div class="post-content mb-4">
+          <% if (post.selftext && post.selftext.length > 0) { %>
+            <div class="prose prose-sm sm:prose max-w-none text-gray-700 whitespace-pre-wrap mb-4"><%= post.selftext %></div>
+          <% } %>
+
+          <% if (post.hasImage && post.imageUrl) { %>
+            <img src="<%= post.imageUrl %>" alt="Post image" class="max-w-full h-auto rounded-lg mb-4" />
+          <% } else if (post.hasVideo && post.videoUrl) { %>
+            <video controls class="max-w-full h-auto rounded-lg mb-4">
+              <source src="<%= post.videoUrl %>" type="video/mp4" />
+              Your browser does not support the video tag.
+            </video>
+          <% } else if (post.hasGallery && post.galleryItems.length > 0) { %>
+            <div class="space-y-3 mb-4">
+              <% post.galleryItems.forEach(function(item) { %>
+                <img src="<%= item.url %>" alt="Gallery image" class="max-w-full h-auto rounded-lg" />
+              <% }) %>
+            </div>
+          <% } %>
+
+          <% if (post.url && !post.url.includes('reddit.com') && !post.hasImage && !post.hasVideo && !post.hasGallery) { %>
+            <div class="bg-gray-100 p-3 rounded-lg text-sm">
+              <span class="text-gray-600">External link:</span>
+              <a href="<%= post.url %>" target="_blank" rel="noreferrer" class="text-orange-600 hover:underline break-all ml-2">
+                <%= post.url %>
+              </a>
+            </div>
+          <% } %>
+        </div>
+
+        <div class="flex items-center gap-4 text-sm text-gray-600 pt-3 border-t">
+          <span class="flex items-center gap-1 font-medium">
+            <span>⬆️</span>
+            <span><%= post.score %> upvotes</span>
+          </span>
+          <span class="flex items-center gap-1">
+            <span>💬</span>
+            <span><%= post.numComments %> comments</span>
+          </span>
+        </div>
+      </div>
+    </article>
+
+    <!-- Comments Section -->
+    <div class="bg-white rounded-lg shadow-sm p-4 sm:p-6">
+      <div class="flex items-center gap-2 mb-6">
+        <h2 class="text-lg sm:text-xl font-bold text-gray-900">💬 Comments</h2>
+        <span class="text-sm text-gray-500">(<%= comments ? comments.length : 0 %> top-level)</span>
+      </div>
+      
+      <% if (!comments || comments.length === 0) { %>
+        <div class="text-center py-8 text-gray-500">
+          <p class="text-lg mb-1">No comments yet</p>
+          <p class="text-sm">Be the first to comment!</p>
+        </div>
+      <% } else { %>
+        <div class="space-y-1">
+          <%
+            function renderComment(comment) {
+              const depthClass = `comment-depth-${Math.min(comment.depth, 5)}`;
+              const scoreColor = comment.score > 100 ? 'text-orange-600 font-bold' : comment.score > 10 ? 'text-orange-500 font-semibold' : 'text-gray-600';
+          %>
+            <div class="<%= depthClass %>">
+              <div class="flex items-center gap-2 mb-2">
+                <span class="text-sm font-bold text-gray-800">u/<%= comment.author %></span>
+                <span class="text-xs <%= scoreColor %> flex items-center gap-1">
+                  <span>⬆️</span>
+                  <span><%= comment.score %></span>
+                </span>
+              </div>
+              <div class="text-sm text-gray-900 comment-body"><%= comment.body %></div>
+              
+              <% if (comment.replies && comment.replies.length > 0) { %>
+                <div class="mt-2 space-y-1">
+                  <% comment.replies.forEach(function(reply) { %>
+                    <% renderComment(reply); %>
+                  <% }); %>
+                </div>
+              <% } %>
+            </div>
+          <%
+            }
+            comments.forEach(function(comment) {
+              renderComment(comment);
+            });
+          %>
+        </div>
+      <% } %>
+    </div>
+  </main>
+
+  <footer class="text-center text-xs text-gray-500 py-6 mt-8">
+    <p>Powered by Reddit JSON API • Self-hosted • No tracking</p>
+  </footer>
+  <link rel="stylesheet" href="/public/styles.css" />
+</body>
+</html>
+
