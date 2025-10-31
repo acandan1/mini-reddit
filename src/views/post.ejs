@@ -17,7 +17,7 @@
     
     /* Comment depth styling with colored borders */
     .comment-depth-0 { margin-left: 0; padding: 0.75rem; background: #f9fafb; border-radius: 0.5rem; margin-bottom: 0.75rem; }
-    .dark .comment-depth-0 { background: #1f2937; }
+    .dark .comment-depth-0 { background: #111827; }
     .comment-depth-1 { margin-left: 1rem; border-left: 3px solid #fb923c; padding-left: 0.75rem; padding-top: 0.5rem; padding-bottom: 0.5rem; }
     .comment-depth-2 { margin-left: 1rem; border-left: 3px solid #38bdf8; padding-left: 0.75rem; padding-top: 0.5rem; padding-bottom: 0.5rem; }
     .comment-depth-3 { margin-left: 1rem; border-left: 3px solid #4ade80; padding-left: 0.75rem; padding-top: 0.5rem; padding-bottom: 0.5rem; }
@@ -38,9 +38,9 @@
     .dark .comment-body a { color: #fb923c; }
     .comment-body p { margin-bottom: 0.75rem; }
     .comment-body pre { background: #f3f4f6; padding: 0.75rem; border-radius: 0.375rem; overflow-x: auto; font-size: 0.875rem; }
-    .dark .comment-body pre { background: #374151; color: #e5e7eb; }
+    .dark .comment-body pre { background: #1f2937; color: #e5e7eb; }
     .comment-body code { background: #f3f4f6; padding: 0.125rem 0.375rem; border-radius: 0.25rem; font-size: 0.875em; font-family: monospace; }
-    .dark .comment-body code { background: #374151; color: #e5e7eb; }
+    .dark .comment-body code { background: #1f2937; color: #e5e7eb; }
     .comment-body ul, .comment-body ol { margin-left: 1.5rem; margin-bottom: 0.75rem; }
     .comment-body li { margin-bottom: 0.25rem; }
   </style>
@@ -54,16 +54,16 @@
     })();
   </script>
 </head>
-<body class="bg-gray-50 dark:bg-gray-900 min-h-screen transition-colors">
-  <header class="bg-white dark:bg-gray-800 border-b dark:border-gray-700 sticky top-0 z-10 shadow-sm">
-    <div class="max-w-6xl mx-auto px-3 sm:px-4 py-3 sm:py-4">
+<body class="bg-gray-50 dark:bg-[#0f0f0f] min-h-screen transition-colors">
+  <header class="bg-white dark:bg-[#1a1a1a] border-b dark:border-gray-800 sm:sticky top-0 z-10 shadow-sm">
+    <div class="max-w-6xl mx-auto px-2 sm:px-4 py-2 sm:py-4">
       <div class="flex items-center justify-between">
         <div class="flex items-center gap-2 sm:gap-3">
-          <a href="/feed" class="text-lg sm:text-xl font-bold text-orange-600 dark:text-orange-500 hover:text-orange-700 dark:hover:text-orange-400">← Mini-Reddit</a>
+          <a href="/feed" class="text-base sm:text-xl font-bold text-orange-600 dark:text-orange-500 hover:text-orange-700 dark:hover:text-orange-400">← Mini-Reddit</a>
         </div>
-        <div class="flex items-center gap-3 sm:gap-4 text-sm">
-          <button id="dark-mode-toggle" class="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors" aria-label="Toggle dark mode">
-            <span id="dark-mode-icon">🌙</span>
+        <div class="flex items-center gap-2 sm:gap-4 text-xs sm:text-sm">
+          <button id="dark-mode-toggle" class="p-1.5 sm:p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors" aria-label="Toggle dark mode">
+            <span id="dark-mode-icon" class="text-base sm:text-lg">🌙</span>
           </button>
           <span class="hidden sm:inline text-gray-600 dark:text-gray-300">Hi, <strong><%= username %></strong></span>
           <a class="text-orange-600 dark:text-orange-500 hover:underline font-medium" href="/logout">Logout</a>
@@ -74,10 +74,10 @@
 
   <main class="max-w-4xl mx-auto px-3 sm:px-4 py-4 sm:py-6">
     <!-- Post Card -->
-    <article class="bg-white dark:bg-gray-800 rounded-lg shadow-sm mb-4 sm:mb-6 overflow-hidden">
+    <article class="bg-white dark:bg-[#1a1a1a] rounded-lg shadow-sm mb-4 sm:mb-6 overflow-hidden">
       <div class="p-4 sm:p-6">
         <div class="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400 mb-3">
-          <a href="/feed" class="font-semibold text-orange-600 dark:text-orange-500 hover:underline">r/<%= post.subreddit %></a>
+          <a href="/r/<%= post.subreddit %>" class="font-semibold text-orange-600 dark:text-orange-500 hover:underline">r/<%= post.subreddit %></a>
           <span>•</span>
           <span>Posted by u/<%= post.author %></span>
           <span>•</span>
@@ -142,7 +142,7 @@
           <% } %>
 
           <% if (post.url && !post.url.includes('reddit.com') && !post.hasImage && !post.hasVideo && !post.hasGallery) { %>
-            <div class="bg-gray-100 dark:bg-gray-700 p-3 rounded-lg text-sm">
+            <div class="bg-gray-100 dark:bg-gray-900 p-3 rounded-lg text-sm">
               <span class="text-gray-600 dark:text-gray-300">External link:</span>
               <a href="<%= post.url %>" target="_blank" rel="noreferrer" class="text-orange-600 dark:text-orange-500 hover:underline break-all ml-2">
                 <%= post.url %>
@@ -165,7 +165,7 @@
     </article>
 
     <!-- Comments Section -->
-    <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-4 sm:p-6">
+    <div class="bg-white dark:bg-[#1a1a1a] rounded-lg shadow-sm p-4 sm:p-6">
       <div class="flex items-center gap-2 mb-6">
         <h2 class="text-lg sm:text-xl font-bold text-gray-900 dark:text-gray-100">💬 Comments</h2>
         <span class="text-sm text-gray-500 dark:text-gray-400">(<%= comments ? comments.length : 0 %> top-level)</span>
