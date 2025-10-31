@@ -73,10 +73,44 @@
           <% if (post.hasImage && post.imageUrl) { %>
             <img src="<%= post.imageUrl %>" alt="Post image" class="max-w-full h-auto rounded-lg mb-4" />
           <% } else if (post.hasVideo && post.videoUrl) { %>
-            <video controls class="max-w-full h-auto rounded-lg mb-4">
-              <source src="<%= post.videoUrl %>" type="video/mp4" />
-              Your browser does not support the video tag.
-            </video>
+            <% if (post.audioUrl && post.hasAudioTrack) { %>
+              <!-- Reddit video with separate audio track -->
+              <div class="mb-4">
+                <video id="reddit-video-<%= post.id %>" controls class="max-w-full h-auto rounded-lg">
+                  <source src="<%= post.videoUrl %>" type="video/mp4" />
+                  Your browser does not support the video tag.
+                </video>
+                <audio id="reddit-audio-<%= post.id %>" src="<%= post.audioUrl %>" style="display:none;" preload="auto"></audio>
+                <script>
+                  (function() {
+                    const video = document.getElementById('reddit-video-<%= post.id %>');
+                    const audio = document.getElementById('reddit-audio-<%= post.id %>');
+                    if (video && audio) {
+                      let audioLoaded = false;
+                      
+                      // Check if audio loads successfully
+                      audio.addEventListener('loadeddata', () => { audioLoaded = true; });
+                      audio.addEventListener('error', () => { 
+                        console.warn('Audio track failed to load for video <%= post.id %>');
+                        audioLoaded = false;
+                      });
+                      
+                      // Sync audio with video
+                      video.addEventListener('play', () => { if (audioLoaded) audio.play().catch(e => console.warn('Audio play failed:', e)); });
+                      video.addEventListener('pause', () => { if (audioLoaded) audio.pause(); });
+                      video.addEventListener('seeked', () => { if (audioLoaded) audio.currentTime = video.currentTime; });
+                      video.addEventListener('volumechange', () => { if (audioLoaded) audio.volume = video.volume; });
+                      video.addEventListener('ratechange', () => { if (audioLoaded) audio.playbackRate = video.playbackRate; });
+                    }
+                  })();
+                </script>
+              </div>
+            <% } else { %>
+              <video controls class="max-w-full h-auto rounded-lg mb-4">
+                <source src="<%= post.videoUrl %>" type="video/mp4" />
+                Your browser does not support the video tag.
+              </video>
+            <% } %>
           <% } else if (post.hasGallery && post.galleryItems.length > 0) { %>
             <div class="space-y-3 mb-4">
               <% post.galleryItems.forEach(function(item) { %>

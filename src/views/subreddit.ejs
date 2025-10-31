@@ -138,11 +138,34 @@
                     <img src="<%= p.imageUrl %>" alt="Post image" class="max-h-96 w-auto mx-auto rounded-lg" loading="lazy" />
                   </a>
                 <% } else if (p.hasVideo && p.videoUrl) { %>
-                  <a href="/post/<%= p.subreddit %>/<%= p.id %>" class="block mb-3">
-                    <video controls class="max-h-96 w-auto mx-auto rounded-lg" preload="metadata">
-                      <source src="<%= p.videoUrl %>" type="video/mp4" />
-                    </video>
-                  </a>
+                  <div class="mb-3">
+                    <% if (p.audioUrl && p.hasAudioTrack) { %>
+                      <video id="sub-video-<%= p.id %>" controls class="max-h-96 w-auto mx-auto rounded-lg" preload="metadata">
+                        <source src="<%= p.videoUrl %>" type="video/mp4" />
+                      </video>
+                      <audio id="sub-audio-<%= p.id %>" src="<%= p.audioUrl %>" style="display:none;" preload="auto"></audio>
+                      <script>
+                        (function() {
+                          const video = document.getElementById('sub-video-<%= p.id %>');
+                          const audio = document.getElementById('sub-audio-<%= p.id %>');
+                          if (video && audio) {
+                            let audioLoaded = false;
+                            audio.addEventListener('loadeddata', () => { audioLoaded = true; });
+                            audio.addEventListener('error', () => { audioLoaded = false; });
+                            video.addEventListener('play', () => { if (audioLoaded) audio.play().catch(() => {}); });
+                            video.addEventListener('pause', () => { if (audioLoaded) audio.pause(); });
+                            video.addEventListener('seeked', () => { if (audioLoaded) audio.currentTime = video.currentTime; });
+                            video.addEventListener('volumechange', () => { if (audioLoaded) audio.volume = video.volume; });
+                          }
+                        })();
+                      </script>
+                    <% } else { %>
+                      <video controls class="max-h-96 w-auto mx-auto rounded-lg" preload="metadata">
+                        <source src="<%= p.videoUrl %>" type="video/mp4" />
+                      </video>
+                    <% } %>
+                    <a href="/post/<%= p.subreddit %>/<%= p.id %>" class="block text-center text-xs text-orange-600 hover:underline mt-1">View post & comments</a>
+                  </div>
                 <% } else if (p.hasGallery && p.galleryItems.length > 0) { %>
                   <a href="/post/<%= p.subreddit %>/<%= p.id %>" class="block mb-3">
                     <img src="<%= p.galleryItems[0].url %>" alt="Gallery image" class="max-h-96 w-auto mx-auto rounded-lg" loading="lazy" />

@@ -25,6 +25,19 @@ function extractMediaInfo(post) {
   if (p.is_video && p.media?.reddit_video) {
     mediaInfo.hasVideo = true;
     mediaInfo.videoUrl = p.media.reddit_video.fallback_url;
+    mediaInfo.hasAudioTrack = p.media.reddit_video.has_audio || false;
+    
+    // Reddit separates audio and video streams for DASH
+    // Audio URL follows pattern: DASH_AUDIO_128.mp4 (or DASH_audio_128.mp4) with same query params
+    if (mediaInfo.hasAudioTrack) {
+      const videoUrl = p.media.reddit_video.fallback_url;
+      // Replace DASH_XXX.mp4 with DASH_AUDIO_128.mp4, preserving query params
+      mediaInfo.audioUrl = videoUrl.replace(/DASH_\d+\.mp4/, 'DASH_AUDIO_128.mp4')
+                                    .replace(/DASH_audio\.mp4/, 'DASH_AUDIO_128.mp4');
+    }
+    
+    mediaInfo.hlsUrl = p.media.reddit_video.hls_url; // Alternative: HLS stream
+    mediaInfo.dashUrl = p.media.reddit_video.dash_url; // DASH manifest
   }
 
   // Check for gallery
