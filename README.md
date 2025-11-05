@@ -15,13 +15,17 @@ It uses Reddit’s public JSON API — no API keys required — and caches posts
 The app includes:
 
 * Basic login (hardcoded credentials in `.env`)
-* Persistent cookie-based authentication
+* **Long-lasting sessions** — stay logged in for 3 months
 * Editable subreddit list (via the UI)
 * Server-side feed fetching & caching
 * **Self-contained post viewing** — no external Reddit links needed
 * **Full comment threads** with nested replies
+* **Reddit-flavored Markdown support** — proper rendering of posts and comments
+* **Fetch any Reddit post by URL** — paste any Reddit link to view it in Mini-Reddit
 * **Media embedding** — images, videos, and galleries display inline
+* **Dark mode** with system preference detection
 * Clean, modern, mobile-friendly UI with Tailwind CSS
+* Enhanced accessibility and keyboard navigation
 * Low resource usage (<50MB RAM idle)
 
 ---
@@ -103,12 +107,15 @@ PORT=3000
 | Feature                          | Description                                           |
 | -------------------------------- | ----------------------------------------------------- |
 | **Login System**                 | Simple form with credentials from `.env`.             |
-| **Persistent Sessions**          | Cookies last for 30 days (configurable).              |
+| **Persistent Sessions**          | Cookies last for 90 days with rolling expiration.     |
 | **Subreddit Management**         | Add/remove subs dynamically via UI.                   |
 | **Feed Caching**                 | Reduces redundant API calls (30 min default).         |
 | **Post Viewing**                 | Click any post to view full content with comments.    |
 | **Comment Threads**              | Nested comment display with proper indentation.       |
+| **Markdown Rendering**           | Full Reddit-flavored Markdown support for posts/comments. |
+| **Fetch Any Post**               | Paste any Reddit URL to view it without leaving app.  |
 | **Media Embedding**              | Images, videos, and galleries display inline.         |
+| **Dark Mode**                    | Toggle dark/light theme with persistent preference.   |
 | **Mobile-Friendly**              | Responsive design optimized for all screen sizes.     |
 
 ---
@@ -189,19 +196,26 @@ Expose via Nginx or directly through Coolify at a subdomain (e.g., `mini.yourdom
 
 * ✅ Self-contained post viewing (no Reddit links needed)
 * ✅ Full comment threads with nested replies
+* ✅ **Reddit-flavored Markdown rendering** (bold, italic, links, code blocks, spoilers, superscript, tables, blockquotes)
+* ✅ **Fetch any Reddit post by URL** via `/fetch` endpoint
 * ✅ Image, video, and gallery embedding
+* ✅ **Dark mode toggle** with localStorage persistence
+* ✅ **Long-lasting sessions** (90 days with rolling expiration)
 * ✅ Mobile-responsive design
 * ✅ Sticky header navigation
+* ✅ Enhanced UI with smooth transitions and hover effects
+* ✅ Collapsible comment threads
 * ✅ Clean, modern UI with Tailwind CSS
 
 ## 🧪 Future Enhancements
 
 * [ ] Save "favorite" posts locally
-* [ ] Dark mode toggle
 * [ ] Comment voting filter (e.g., top 3 comments only)
 * [ ] Offline mode (cached JSON browsing)
 * [ ] RSS export (for your chosen subs)
 * [ ] Search within your feed
 * [ ] Filter by subreddit in feed view
+* [ ] Keyboard shortcuts for navigation
+* [ ] Multi-reddit support (combine multiple subreddits)
 
 ---

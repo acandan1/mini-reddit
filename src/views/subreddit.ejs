@@ -14,6 +14,18 @@
   <style>
     .post-content img { max-width: 100%; height: auto; border-radius: 0.5rem; }
     .post-content video { max-width: 100%; height: auto; border-radius: 0.5rem; }
+    
+    /* Markdown content styling for feed previews */
+    .markdown-preview {
+      line-height: 1.6;
+      overflow: hidden;
+      display: -webkit-box;
+      -webkit-line-clamp: 3;
+      -webkit-box-orient: vertical;
+    }
+    .markdown-preview p { display: inline; }
+    .markdown-preview a { color: #ea580c; text-decoration: underline; }
+    .dark .markdown-preview a { color: #fb923c; }
   </style>
   <script>
     // Dark mode initialization - runs immediately to prevent flash
@@ -31,6 +43,8 @@
       <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-3">
         <div class="flex items-center gap-2 sm:gap-3 flex-wrap">
           <a href="/feed" class="text-base sm:text-xl font-bold text-orange-600 dark:text-orange-500 hover:text-orange-700 dark:hover:text-orange-400">Mini-Reddit</a>
+          <span class="hidden sm:inline text-gray-400 dark:text-gray-500">|</span>
+          <a href="/fetch" class="text-xs sm:text-sm text-gray-600 dark:text-gray-300 hover:text-orange-600 dark:hover:text-orange-500 font-medium transition-colors whitespace-nowrap">🔗 Fetch Post</a>
           <span class="hidden sm:inline text-gray-400 dark:text-gray-500">|</span>
           <form method="post" action="/subs/add" class="flex items-center gap-1.5 sm:gap-2 flex-1 sm:flex-initial">
             <input name="subreddit" placeholder="Add subreddit" class="border border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-white rounded px-2 sm:px-3 py-1 text-sm flex-1 sm:w-40 focus:outline-none focus:ring-2 focus:ring-orange-500 dark:placeholder-gray-500" />
@@ -147,8 +161,8 @@
                   </h3>
                 </a>
 
-                <% if (p.selftext && p.selftext.length > 0 && p.selftext.length < 300) { %>
-                  <p class="text-sm text-gray-600 dark:text-gray-300 mb-3 line-clamp-3"><%= p.selftext %></p>
+                <% if (p.selftextHtml && p.selftextHtml.length > 0) { %>
+                  <div class="text-sm text-gray-600 dark:text-gray-300 mb-3 markdown-preview"><%- p.selftextHtml %></div>
                 <% } %>
 
                 <% if (p.hasImage && p.imageUrl) { %>

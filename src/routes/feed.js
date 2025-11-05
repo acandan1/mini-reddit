@@ -1,7 +1,7 @@
 import path from 'node:path';
 import fs from 'node:fs';
 import { fileURLToPath } from 'node:url';
-import { fetchSubredditPosts, fetchPostWithComments } from '../utils/fetchReddit.js';
+import { fetchSubredditPosts, fetchPostWithComments, parseRedditUrl } from '../utils/fetchReddit.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -102,6 +102,69 @@ export default async function feedRoutes(fastify) {
     } catch (err) {
       fastify.log.error(err);
       return reply.status(404).send('Post not found');
+    }
+  });
+
+  // New endpoint to fetch any Reddit post by URL
+  fastify.get('/fetch', async (request, reply) => {
+    const subs = readConfig();
+    return reply.view('fetch.ejs', {
+      title: 'Fetch Reddit Post - Mini-Reddit',
+      username: request.session?.username,
+      subreddits: subs,
+      error: null,
+      post: null,
+      comments: null
+    });
+  });
+
+  fastify.post('/fetch', async (request, reply) => {
+    const { url } = request.body || {};
+    const subs = readConfig();
+
+    if (!url || typeof url !== 'string') {
+      return reply.view('fetch.ejs', {
+        title: 'Fetch Reddit Post - Mini-Reddit',
+        username: request.session?.username,
+        subreddits: subs,
+        error: 'Please provide a valid Reddit URL',
+        post: null,
+        comments: null
+      });
+    }
+
+    const parsed = parseRedditUrl(url.trim());
+    if (!parsed) {
+      return reply.view('fetch.ejs', {
+        title: 'Fetch Reddit Post - Mini-Reddit',
+        username: request.session?.username,
+        subreddits: subs,
+        error: 'Invalid Reddit URL format. Please use a URL like: https://reddit.com/r/subreddit/comments/postid/title',
+        post: null,
+        comments: null
+      });
+    }
+
+    try {
+      const { post, comments } = await fetchPostWithComments(parsed.subreddit, parsed.postId);
+      return reply.view('fetch.ejs', {
+        title: `${post.title} - Mini-Reddit`,
+        username: request.session?.username,
+        subreddits: subs,
+        error: null,
+        post,
+        comments
+      });
+    } catch (err) {
+      fastify.log.error(err);
+      return reply.view('fetch.ejs', {
+        title: 'Fetch Reddit Post - Mini-Reddit',
+        username: request.session?.username,
+        subreddits: subs,
+        error: 'Failed to fetch post. Please check the URL and try again.',
+        post: null,
+        comments: null
+      });
     }
   });
 }

@@ -1,4 +1,5 @@
 import { cache } from './cache.js';
+import { parseMarkdownSafe, decodeHtmlEntities } from './markdown.js';
 
 const DEFAULT_LIMIT = 25;
 const DEFAULT_TTL_MS = 30 * 60 * 1000; // 30 minutes
@@ -85,6 +86,11 @@ export async function fetchSubredditPosts(subreddit, options = {}) {
   const posts = (data?.data?.children || []).map((child) => {
     const p = child.data || {};
     const media = extractMediaInfo(child);
+    
+    // Parse markdown for selftext
+    const selftext = p.selftext || '';
+    const selftextHtml = selftext ? parseMarkdownSafe(selftext) : '';
+    
     return {
       id: p.id,
       title: p.title,
@@ -95,8 +101,8 @@ export async function fetchSubredditPosts(subreddit, options = {}) {
       numComments: p.num_comments,
       score: p.score,
       subreddit: p.subreddit,
-      selftext: p.selftext || '',
-      selftextHtml: p.selftext_html || null,
+      selftext: selftext,
+      selftextHtml: selftextHtml,
       ...media
     };
   });
@@ -132,6 +138,11 @@ export async function fetchPostWithComments(subreddit, postId, options = {}) {
   }
 
   const media = extractMediaInfo({ data: postData });
+  
+  // Parse markdown for post selftext
+  const selftext = postData.selftext || '';
+  const selftextHtml = selftext ? parseMarkdownSafe(selftext) : '';
+  
   const post = {
     id: postData.id,
     title: postData.title,
@@ -142,8 +153,8 @@ export async function fetchPostWithComments(subreddit, postId, options = {}) {
     numComments: postData.num_comments,
     score: postData.score,
     subreddit: postData.subreddit,
-    selftext: postData.selftext || '',
-    selftextHtml: postData.selftext_html || null,
+    selftext: selftext,
+    selftextHtml: selftextHtml,
     ...media
   };
 
@@ -151,11 +162,15 @@ export async function fetchPostWithComments(subreddit, postId, options = {}) {
     const c = commentData.data;
     if (!c || c.author === '[deleted]') return null;
     
+    // Parse markdown for comment body
+    const body = c.body || '';
+    const bodyHtml = body ? parseMarkdownSafe(body) : '';
+    
     return {
       id: c.id,
       author: c.author,
-      body: c.body || '',
-      bodyHtml: c.body_html || null,
+      body: body,
+      bodyHtml: bodyHtml,
       score: c.score,
       createdUtc: c.created_utc,
       depth,
@@ -172,6 +187,38 @@ export async function fetchPostWithComments(subreddit, postId, options = {}) {
   const result = { post, comments };
   cache.set(cacheKey, result, ttlMs);
   return result;
+}
+
+/**
+ * Parse a Reddit URL and extract subreddit and post ID
+ * @param {string} url - Reddit URL (e.g., https://reddit.com/r/subreddit/comments/abc123/title)
+ * @returns {object|null} - { subreddit, postId } or null if invalid
+ */
+export function parseRedditUrl(url) {
+  if (!url || typeof url !== 'string') return null;
+
+  // Handle various Reddit URL formats:
+  // - https://www.reddit.com/r/subreddit/comments/postid/title/
+  // - https://reddit.com/r/subreddit/comments/postid/
+  // - https://old.reddit.com/r/subreddit/comments/postid/
+  // - /r/subreddit/comments/postid/
+  
+  const patterns = [
+    /(?:https?:\/\/)?(?:www\.|old\.|new\.)?reddit\.com\/r\/([^\/]+)\/comments\/([a-z0-9]+)/i,
+    /^\/r\/([^\/]+)\/comments\/([a-z0-9]+)/i
+  ];
+
+  for (const pattern of patterns) {
+    const match = url.match(pattern);
+    if (match) {
+      return {
+        subreddit: match[1],
+        postId: match[2]
+      };
+    }
+  }
+
+  return null;
 }
 
 

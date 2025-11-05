@@ -15,6 +15,84 @@
     .post-content img { max-width: 100%; height: auto; border-radius: 0.5rem; }
     .post-content video { max-width: 100%; height: auto; border-radius: 0.5rem; }
     
+    /* Markdown content styling */
+    .markdown-content {
+      line-height: 1.7;
+      word-wrap: break-word;
+      overflow-wrap: break-word;
+    }
+    .markdown-content p { margin-bottom: 1rem; }
+    .markdown-content h1, .markdown-content h2, .markdown-content h3 { 
+      font-weight: 700; 
+      margin-top: 1.5rem; 
+      margin-bottom: 1rem;
+    }
+    .markdown-content h1 { font-size: 1.875rem; }
+    .markdown-content h2 { font-size: 1.5rem; }
+    .markdown-content h3 { font-size: 1.25rem; }
+    .markdown-content a { 
+      color: #ea580c; 
+      text-decoration: underline; 
+      word-break: break-all;
+    }
+    .dark .markdown-content a { color: #fb923c; }
+    .markdown-content pre { 
+      background: #f3f4f6; 
+      padding: 1rem; 
+      border-radius: 0.5rem; 
+      overflow-x: auto; 
+      margin-bottom: 1rem;
+      font-size: 0.875rem;
+    }
+    .dark .markdown-content pre { background: #1f2937; color: #e5e7eb; }
+    .markdown-content code { 
+      background: #f3f4f6; 
+      padding: 0.125rem 0.375rem; 
+      border-radius: 0.25rem; 
+      font-size: 0.875em; 
+      font-family: monospace;
+    }
+    .dark .markdown-content code { background: #1f2937; color: #e5e7eb; }
+    .markdown-content pre code { background: none; padding: 0; }
+    .markdown-content ul, .markdown-content ol { 
+      margin-left: 1.5rem; 
+      margin-bottom: 1rem;
+    }
+    .markdown-content li { margin-bottom: 0.5rem; }
+    .markdown-content blockquote { 
+      border-left: 4px solid #ea580c; 
+      padding-left: 1rem; 
+      margin: 1rem 0; 
+      color: #6b7280;
+    }
+    .dark .markdown-content blockquote { 
+      border-left-color: #fb923c; 
+      color: #9ca3af;
+    }
+    .markdown-content .spoiler { 
+      background: #1f2937; 
+      color: #1f2937; 
+      padding: 0.125rem 0.25rem;
+      border-radius: 0.25rem;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .markdown-content .spoiler:hover { color: #e5e7eb; }
+    .dark .markdown-content .spoiler { background: #f3f4f6; color: #f3f4f6; }
+    .dark .markdown-content .spoiler:hover { color: #1f2937; }
+    .markdown-content table { 
+      width: 100%; 
+      border-collapse: collapse; 
+      margin-bottom: 1rem;
+    }
+    .markdown-content th, .markdown-content td { 
+      border: 1px solid #e5e7eb; 
+      padding: 0.5rem;
+    }
+    .dark .markdown-content th, .dark .markdown-content td { border-color: #374151; }
+    .markdown-content th { background: #f9fafb; font-weight: 600; }
+    .dark .markdown-content th { background: #1f2937; }
+    
     /* Comment depth styling - consistent colored borders for threading */
     .comment-depth-0 { margin-left: 0; padding: 0.75rem; background: #f9fafb; border-radius: 0.5rem; margin-bottom: 0.75rem; max-width: 100%; box-sizing: border-box; overflow-wrap: break-word; }
     .dark .comment-depth-0 { background: #111827; }
@@ -41,19 +119,6 @@
       }
     }
     
-    .comment-body { line-height: 1.6; word-wrap: break-word; overflow-wrap: break-word; }
-    .comment-body a { color: #ea580c; text-decoration: underline; word-break: break-all; }
-    .dark .comment-body a { color: #fb923c; }
-    .comment-body p { margin-bottom: 0.75rem; word-wrap: break-word; overflow-wrap: break-word; }
-    .comment-body pre { background: #f3f4f6; padding: 0.75rem; border-radius: 0.375rem; overflow-x: auto; font-size: 0.875rem; word-wrap: break-word; overflow-wrap: break-word; }
-    .dark .comment-body pre { background: #1f2937; color: #e5e7eb; }
-    .comment-body code { background: #f3f4f6; padding: 0.125rem 0.375rem; border-radius: 0.25rem; font-size: 0.875em; font-family: monospace; word-wrap: break-word; overflow-wrap: break-word; }
-    .dark .comment-body code { background: #1f2937; color: #e5e7eb; }
-    .comment-body ul, .comment-body ol { margin-left: 1.5rem; margin-bottom: 0.75rem; }
-    .comment-body li { margin-bottom: 0.25rem; }
-    
-    /* Prevent text overflow */
-    .comment-body, .comment-body * { max-width: 100%; box-sizing: border-box; }
     
     /* Comment header - prevent overflow */
     .comment-header { 
@@ -139,10 +204,10 @@
 
         <h1 class="text-xl sm:text-2xl font-bold text-gray-900 dark:text-gray-100 mb-4"><%= post.title %></h1>
 
-        <div class="post-content mb-4">
-          <% if (post.selftext && post.selftext.length > 0) { %>
-            <div class="prose prose-sm sm:prose max-w-none text-gray-700 dark:text-gray-300 whitespace-pre-wrap mb-4"><%= post.selftext %></div>
-          <% } %>
+          <div class="post-content mb-4">
+            <% if (post.selftextHtml && post.selftextHtml.length > 0) { %>
+              <div class="markdown-content prose prose-sm sm:prose max-w-none text-gray-700 dark:text-gray-300 mb-4"><%- post.selftextHtml %></div>
+            <% } %>
 
           <% if (post.hasImage && post.imageUrl) { %>
             <img src="<%= post.imageUrl %>" alt="Post image" class="max-w-full h-auto rounded-lg mb-4" />
@@ -249,8 +314,8 @@
                   <span><%= comment.score %></span>
                 </span>
               </div>
-              <div class="comment-content" id="<%= commentId %>-content">
-                <div class="text-sm text-gray-900 dark:text-gray-300 comment-body"><%= comment.body %></div>
+                <div class="comment-content" id="<%= commentId %>-content">
+                  <div class="text-sm text-gray-900 dark:text-gray-300 markdown-content"><%- comment.bodyHtml %></div>
                 
                 <% if (hasReplies) { %>
                   <div class="mt-2 space-y-1">

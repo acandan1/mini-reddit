@@ -40,9 +40,9 @@ await app.register(fastifySession, {
     httpOnly: true,
     sameSite: 'lax',
     path: '/',
-    maxAge: 60 * 60 * 24 * 30 // 30 days
+    maxAge: 60 * 60 * 24 * 90 // 90 days (3 months)
   },
-  rolling: true,
+  rolling: true, // Extends session on each request
   saveUninitialized: false
 });
 
